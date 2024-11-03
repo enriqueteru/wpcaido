@@ -12,11 +12,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      
-      - name: Install sshpass
-        run: sudo apt-get install -y sshpass
-      
-      # Setup SSH
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y sshpass rsync
+
+      # Configurar la llave SSH
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh/
@@ -28,7 +30,37 @@ jobs:
             UserKnownHostsFile=/dev/null" > ~/.ssh/config
           chmod 600 ~/.ssh/config
 
-      # Test SSH connection with key test
-      - name: Test SSH connection
+      # Crear el directorio remoto si no existe
+      - name: Create remote directory
         run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "echo 'Connection test successful'"
+          ssh -i ~/.ssh/id_rsa ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "sudo mkdir -p /root/docs && sudo chown ${{ secrets.VPS_USER }} /root/docs"
+
+      # Sincronizar archivos del repositorio al VPS
+      - name: Sync files to VPS
+        run: |
+          rsync -avz --delete ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/root/docs
+
+      # Instalar dependencias y construir el proyecto de Docusaurus en el VPS
+      - name: Install dependencies and build Docusaurus
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            cd /root/docs/docusaurus &&
+            npm install &&
+            npm run build
+          "
+
+      # Configurar la red de Docker si no existe
+      - name: Ensure Docker network exists
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            docker network inspect web || docker network create web
+          "
+
+      # Iniciar Caddy y Docusaurus con Docker Compose en el VPS
+      - name: Launch Docker services
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            cd /root/docs/caddy &&
+            docker-compose down &&
+            docker-compose up -d --build
+          "
