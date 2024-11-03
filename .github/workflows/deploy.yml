@@ -27,7 +27,7 @@ jobs:
             UserKnownHostsFile=/dev/null" > ~/.ssh/config
           chmod 600 ~/.ssh/config
 
-      # Test SSH connection with key
+      # Test SSH connection with key test
       - name: Test SSH connection
         run: |
           ssh -i ~/.ssh/id_rsa ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "echo 'Connection test successful'"
