@@ -33,18 +33,18 @@ jobs:
       # Crear el directorio remoto si no existe
       - name: Create remote directory
         run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "sudo mkdir -p /root/docs && sudo chown ${{ secrets.VPS_USER }} /root/docs"
+          ssh -i ~/.ssh/id_rsa ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "sudo mkdir -p /root && sudo chown ${{ secrets.VPS_USER }} /root"
 
       # Sincronizar archivos del repositorio al VPS
       - name: Sync files to VPS
         run: |
-          rsync -avz --delete ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/root/docs
+          rsync -avz --delete ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/root
 
       # Instalar dependencias y construir el proyecto de Docusaurus en el VPS
       - name: Install dependencies and build Docusaurus
         run: |
           ssh -i ~/.ssh/id_rsa ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
-            cd /root/docs/docusaurus &&
+            cd /root/docusaurus &&
             npm install &&
             npm run build
           "
@@ -60,7 +60,7 @@ jobs:
       - name: Launch Docker services
         run: |
           ssh -i ~/.ssh/id_rsa ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
-            cd /root/docs/caddy &&
+            cd /root/caddy &&
             docker-compose down &&
             docker-compose up -d --build
           "
