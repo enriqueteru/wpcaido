@@ -1,0 +1,33 @@
+name: Self-hosted deployment
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
+      
+      # Setup SSH
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh/
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+          echo "Host ${{ secrets.VPS_HOST }}
+            StrictHostKeyChecking no
+            UserKnownHostsFile=/dev/null" > ~/.ssh/config
+          chmod 600 ~/.ssh/config
+
+      # Test SSH connection with key
+      - name: Test SSH connection
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "echo 'Connection test successful'"

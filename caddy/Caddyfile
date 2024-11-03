@@ -1,0 +1,3 @@
+docs.wpcaido.com {
+    reverse_proxy docusaurus:80
+}
