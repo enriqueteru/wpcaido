@@ -12,10 +12,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       
-      - name: Install sshpass
-        run: sudo apt-get install -y sshpass
-      
-      # Setup SSH
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y sshpass rsync
+
+      # Configurar la llave SSH
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh/
@@ -27,7 +29,23 @@ jobs:
             UserKnownHostsFile=/dev/null" > ~/.ssh/config
           chmod 600 ~/.ssh/config
 
-      # Test SSH connection with key
+      # Probar conexión SSH
       - name: Test SSH connection
         run: |
           ssh -i ~/.ssh/id_rsa ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "echo 'Connection test successful'"
+
+      # Transferir archivos al VPS
+      - name: Transfer project files to VPS
+        env:
+          RSYNC_RSH: "ssh -i ~/.ssh/id_rsa"
+        run: |
+          rsync -avz --delete ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/${{ secrets.VPS_USER }}/my-docusaurus-site
+
+      # Ejecutar Docker Compose en el VPS para lanzar en producción
+      - name: Deploy on VPS
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            cd /home/${{ secrets.VPS_USER }}/my-docusaurus-site/docusaurus &&
+            docker-compose down &&
+            docker-compose up -d --build
+          "
