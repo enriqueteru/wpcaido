@@ -12,12 +12,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y sshpass rsync
-
-      # Configurar la llave SSH
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
+      
+      # Setup SSH
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh/
@@ -29,21 +27,7 @@ jobs:
             UserKnownHostsFile=/dev/null" > ~/.ssh/config
           chmod 600 ~/.ssh/config
 
-      # Crear el directorio remoto si no existe
-      - name: Create remote directory
+      # Test SSH connection with key
+      - name: Test SSH connection
         run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "sudo mkdir -p /root/docs && sudo chown ${{ secrets.VPS_USER }} /root/docs"
-
-      # Sincronizar archivos con rsync
-      - name: Sync files to VPS
-        run: |
-          rsync -avz --delete ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/root/docs
-
-      # Ejecutar el contenedor en el VPS
-      - name: Deploy Docusaurus
-        run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
-            cd /root/docs
-            docker-compose down
-            docker-compose up -d
-          EOF
+          ssh -i ~/.ssh/id_rsa ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "echo 'Connection test successful'"
