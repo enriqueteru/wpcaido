@@ -23,5 +23,5 @@ jobs:
 
       - name: Transfer files to VPS
         run: |
-          # Reemplaza '/path/to/local/dir/*' con la ruta del directorio que deseas transferir
-          scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa /path/to/local/dir/* root@188.245.182.111:/root/
+          # Transfiere todos los archivos del repositorio al directorio /root/ en el VPS
+          scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r ./* root@188.245.182.111:/root/
