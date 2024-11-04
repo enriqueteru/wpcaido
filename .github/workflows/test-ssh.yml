@@ -3,7 +3,6 @@ name: Test SSH Connection to VPS
 on:
   workflow_dispatch: 
 
-
 jobs:
   ssh-connection-check:
     runs-on: ubuntu-latest
@@ -22,6 +21,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 'echo "Connection successful"'
 
-      - name: Create example.md in /root/
+      - name: Transfer files to VPS
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 'echo "# Example File" > /root/example.md && echo "Data transferred successfully." >> /root/example.md'
+          # Reemplaza '/path/to/local/dir/*' con la ruta del directorio que deseas transferir
+          scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa /path/to/local/dir/* root@188.245.182.111:/root/
