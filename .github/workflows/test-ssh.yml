@@ -1,17 +1,22 @@
-name: Test SSH Connection to VPS
-
-on:
-  workflow_dispatch: # Permite ejecutar la acción manualmente
-
 jobs:
-  test-ssh:
+  ssh-connection-check:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Configurar clave SSH
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-      
-      - name: Verificar conexión SSH
-        run: ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "echo 'Conexión SSH exitosa'"
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Test SSH Connection
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 'echo "Connection successful"'
+
+      - name: Create example.md
+        run: |
+          echo "# Example File" > example.md
+          echo "Data transferred successfully." >> example.md
