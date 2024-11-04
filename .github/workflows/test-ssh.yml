@@ -1,3 +1,8 @@
+name: Test SSH Connection to VPS
+
+on:
+  workflow_dispatch: # Permite ejecutar la acción manualmente
+
 jobs:
   ssh-connection-check:
     runs-on: ubuntu-latest
