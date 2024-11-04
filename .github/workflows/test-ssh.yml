@@ -1,7 +1,8 @@
 name: Test SSH Connection to VPS
 
 on:
-  workflow_dispatch: # Permite ejecutar la acción manualmente
+  workflow_dispatch: 
+
 
 jobs:
   ssh-connection-check:
@@ -21,7 +22,6 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 'echo "Connection successful"'
 
-      - name: Create example.md
+      - name: Create example.md in /root/
         run: |
-          echo "# Example File" > example.md
-          echo "Data transferred successfully." >> example.md
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 'echo "# Example File" > /root/example.md && echo "Data transferred successfully." >> /root/example.md'
