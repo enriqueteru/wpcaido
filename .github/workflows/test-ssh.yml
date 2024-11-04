@@ -1,23 +1,17 @@
 name: Test SSH Connection to VPS
 
 on:
-  workflow_dispatch: 
+  workflow_dispatch: # Permite ejecutar la acción manualmente
 
 jobs:
-  ssh-connection:
+  test-ssh:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
-
-      - name: Connect to VPS and run commands
-        uses: appleboy/ssh-action@v0.1.7
+      - name: Configurar clave SSH
+        uses: webfactory/ssh-agent@v0.5.3
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          script: |
-            echo "Conexión exitosa al VPS"
-            # Aquí puedes agregar otros comandos de prueba para ejecutarlos en el VPS
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      
+      - name: Verificar conexión SSH
+        run: ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "echo 'Conexión SSH exitosa'"
