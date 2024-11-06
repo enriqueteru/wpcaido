@@ -3,6 +3,12 @@
  * and scoped locally.
  */
 
+
+ .margins {
+  margin-top: 3rem;
+  margin-bottom: 3rem;  
+}
+
 .heroBanner {
   padding: 4rem 0;
   text-align: center;

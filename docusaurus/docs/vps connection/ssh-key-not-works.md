@@ -1,4 +1,8 @@
-# Guía para Configurar Permisos Correctos en `/root` para Acceso SSH sin Contraseña
+---
+sidebar_position: 1
+---
+
+# Configurar Permisos vía SSH
 
 Si SSH sigue pidiendo una contraseña incluso después de agregar una clave pública a `authorized_keys`, es posible que haya un problema con los permisos o el propietario del directorio `/root`. A continuación, se detallan los pasos para verificar y corregir esta configuración en servidores Linux.
 
