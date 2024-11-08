@@ -1,17 +1,33 @@
-name: Test SSH Connection to VPS
+name: Deploy to VPS
 
 on:
-  workflow_dispatch: 
+  push:
+    branches:
+      - master
+  workflow_dispatch:
 
 jobs:
-  ssh-connection-check:
+  deploy-to-vps:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Set up SSH key
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'  # You can specify the Node.js version you need
+
+      - name: Install Dependencies
+        working-directory: ./docusaurus  # Specify the Docusaurus directory
+        run: npm install
+
+      - name: Build Docusaurus
+        working-directory: ./docusaurus
+        run: npm run build
+
+      - name: Set up SSH Key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
@@ -21,7 +37,31 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 'echo "Connection successful"'
 
-      - name: Transfer files to VPS
+      - name: Clean Up Existing Directories in /root
         run: |
-          # Transfiere todos los archivos del repositorio al directorio /root/ en el VPS
-          scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r ./* root@188.245.182.111:/root/
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 \
+          'rm -rf /root/* && echo "Cleaned up /root directory"'
+
+      - name: Transfer Built Files to VPS
+        run: |
+          scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r ./docusaurus/build/* root@188.245.182.111:/root/docusaurus
+
+      - name: Check Docker Network for Caddy
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 \
+          'if ! docker network ls | grep -q "caddy"; then
+             echo "Creating Caddy Docker network...";
+             docker network create caddy;
+           else
+             echo "Caddy Docker network already exists.";
+           fi'
+
+      - name: Start Caddy with Docker Compose
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 \
+          'cd /root/caddy && docker-compose up -d'
+
+      - name: Final Verification
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 \
+          'echo "Deployment completed successfully."'
