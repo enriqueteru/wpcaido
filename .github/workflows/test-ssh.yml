@@ -1,10 +1,13 @@
-name: Test SSH Connection to VPS
+name: Deploy to VPS
 
 on:
-  workflow_dispatch: 
+  push:
+    branches:
+      - master
+  workflow_dispatch:
 
 jobs:
-  ssh-connection-check:
+  deploy-to-vps:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,7 +24,36 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 'echo "Connection successful"'
 
-      - name: Transfer files to VPS
+      - name: Clean Up Existing Directories in /root
         run: |
-          # Transfiere todos los archivos del repositorio al directorio /root/ en el VPS
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 \
+          'rm -rf /root/* && echo "Cleaned up /root directory"'
+
+      - name: Transfer Files to VPS
+        run: |
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r ./* root@188.245.182.111:/root/
+
+      - name: Check Docker Network for Caddy
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 \
+          'if ! docker network ls | grep -q "caddy"; then
+             echo "Creating Caddy Docker network...";
+             docker network create caddy;
+           else
+             echo "Caddy Docker network already exists.";
+           fi'
+
+      - name: Start Caddy with Docker Compose
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 \
+          'cd /root/caddy && docker compose up -d'
+
+      - name: Handle Docusaurus
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 \
+          'cd /root/docusaurus && npm install && npm run build && docker compose up -d'
+
+      - name: Final Verification
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 \
+          'echo "Deployment completed successfully."'
