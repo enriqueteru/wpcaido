@@ -11,18 +11,23 @@ jobs:
   deploy-to-vps:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Deploy Docusaurus to VPS
-        env:
-          SSH_KEY: ${{ secrets.SSH_KEY }}  # Asegúrate de tener esta clave privada en tus Secrets
-        run: |
-          echo "$SSH_KEY" > ssh_key
-          chmod 600 ssh_key
-          ssh -o StrictHostKeyChecking=no -i ssh_key root@188.245.182.111 << 'EOF'
-            set -e  # Detener la ejecución si ocurre un error
-            cd /root/docusaurus
-            npm install
-            npm run build
-            docker-compose up -d
-          EOF
-          rm ssh_key
+   steps:
+    - name: Set up SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+  
+    - name: Test SSH Connection
+      run: |
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 'echo "Connection successful"'
+  
+    - name: Deploy Docusaurus to VPS
+      run: |
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 << 'EOF'
+          set -e  # Stop execution if an error occurs
+          cd /root/docusaurus
+          npm install
+          npm run build
+          docker-compose up -d
+        EOF
