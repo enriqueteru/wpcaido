@@ -1,4 +1,4 @@
-name: Deploy to VPS
+name: Deploy to VPS and start Caddy
 
 on:
   push:
@@ -47,17 +47,6 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 \
           'cd /root/caddy && docker-compose up -d'
-
-      
-      - name: Handle Docusaurus on VPS
-        run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 << 'EOF'
-            set -e  # Detener la ejecución si ocurre un error
-            cd /root/docusaurus
-            npm install
-            npm run build
-            docker-compose up -d
-          EOF
 
       - name: Final Verification
         run: |
