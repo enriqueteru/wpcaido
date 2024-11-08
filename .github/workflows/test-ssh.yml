@@ -46,12 +46,12 @@ jobs:
       - name: Start Caddy with Docker Compose
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 \
-          'cd /root/caddy && docker compose up -d'
+          'cd /root/caddy && docker-compose up -d'
 
       - name: Handle Docusaurus
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 \
-          'cd /root/docusaurus && npm install && npm run build && docker compose up -d'
+          'cd /root/docusaurus && npm install && npm run build && docker-compose up -d'
 
       - name: Final Verification
         run: |
