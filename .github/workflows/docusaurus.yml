@@ -3,9 +3,9 @@ name: Docusaurus Build and Deploy
 on:
   workflow_run:
     workflows:
-      - "Deploy to VPS and start Caddy"  # Nombre del primer flujo de trabajo
+      - "Deploy to VPS and start Caddy" 
     types:
-      - completed  # Se ejecuta cuando el primer workflow ha completado
+      - completed  
 
 jobs:
   docusaurus-build-and-deploy:
@@ -21,13 +21,3 @@ jobs:
       - name: Test SSH Connection
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 'echo "Connection successful"'
-
-      - name: Deploy Docusaurus to VPS
-        run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 << 'EOF'
-            set -e  # Stop execution if an error occurs
-            cd /root/docusaurus
-            npm install
-            npm run build
-            docker-compose up -d
-          EOF
