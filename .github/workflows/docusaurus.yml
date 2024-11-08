@@ -1,0 +1,23 @@
+name: Docusaurus Build and Deploy
+
+on:
+  workflow_run:
+    workflows:
+      - "Deploy to VPS and start Caddy" # Nombre del primer flujo de trabajo
+    types:
+      - completed # Se ejecuta cuando el primer workflow ha completado
+
+      - name: Docusaurus Build and Deploy
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }} # Asegúrate de tener esta clave privada en tus Secrets
+        run: |
+          echo "$SSH_KEY" > ssh_key
+          chmod 600 ssh_key
+          ssh -o StrictHostKeyChecking=no -i ssh_key root@188.245.182.111 << 'EOF'
+            set -e  # Detiene la ejecución si hay un error
+            cd /root/docusaurus
+            npm install
+            npm run build
+            docker-compose up -d
+          EOF
+          rm ssh_key
