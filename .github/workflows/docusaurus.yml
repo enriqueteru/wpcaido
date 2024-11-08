@@ -8,7 +8,7 @@ on:
       - completed  # Se ejecuta cuando el primer workflow ha completado
 
 jobs:
-  deploy-to-vps:
+  docusaurus-build-and-deploy:
     runs-on: ubuntu-latest
 
    steps:
