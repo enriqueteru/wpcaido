@@ -1,4 +1,4 @@
-name: Docusaurus Build and Deploy
+name: Test connection docker network
 
 on:
   workflow_run:

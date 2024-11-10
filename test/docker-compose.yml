@@ -1,0 +1,9 @@
+version: '3'
+services:
+  test:
+    image: nginx:alpine
+    container_name: test
+    ports:
+      - "8443:80"
+    volumes:
+      - ./index.html:/usr/share/nginx/html/index.html
