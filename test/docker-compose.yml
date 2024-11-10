@@ -7,3 +7,9 @@ services:
       - "8443:80"
     volumes:
       - ./index.html:/usr/share/nginx/html/index.html
+    networks:
+      - caddy
+
+networks:
+  caddy:
+    external: true
