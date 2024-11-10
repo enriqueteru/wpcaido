@@ -18,18 +18,22 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      - name: Test SSH Connection and manage Docker containers
+      - name: Clean up Docker and restart services
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@188.245.182.111 '
-            echo "Connection successful" &&
-            echo "Checking Docker and Docker Compose..." &&
-            which docker &&
-            which docker-compose &&
-            docker --version &&
-            docker-compose --version &&
-            echo "Navigating to project directory..." &&
-            cd /root/health-check/ &&
-            echo "Starting Docker Compose..." &&
+            echo "Stopping and removing all Docker containers..." &&
+            docker stop $(docker ps -aq) &&
+            docker rm $(docker ps -aq) &&
+            echo "All containers stopped and removed" &&
+            
+            echo "Starting Caddy container..." &&
+            cd /root/caddy &&
             docker-compose up -d &&
-            echo "Containers started successfully"
+            
+            echo "Starting health-check container..." &&
+            cd /root/health-check &&
+            docker-compose up -d &&
+            
+            echo "Showing running containers:" &&
+            docker ps
           '
