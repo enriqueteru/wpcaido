@@ -3,5 +3,5 @@ health-check.wpcaido.com {
 }
 
 enriqueteruel.com {
-    reverse_proxy enriqueteruel:80
+    reverse_proxy enriqueteruel:3000
 }
