@@ -18,8 +18,8 @@ services:
       - caddy
 
   db:
-    image: arm64v8/mysql:5.7
-    container_name: mysql
+    image: arm64v8/mariadb:10.5
+    container_name: mariadb
     restart: always
     environment:
       MYSQL_DATABASE: wp_database
