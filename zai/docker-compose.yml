@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   wordpress:
-    image: wordpress:latest
+    image: arm64v8/wordpress:latest
     container_name: zai
     restart: always
     ports:
@@ -18,7 +18,7 @@ services:
       - caddy
 
   db:
-    image: mysql:5.7
+    image: arm64v8/mysql:5.7
     container_name: mysql
     restart: always
     environment:
