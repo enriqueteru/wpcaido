@@ -5,3 +5,7 @@ health-check.wpcaido.com {
 enriqueteruel.com {
     reverse_proxy enriqueteruel:3000
 }
+
+migration.zai.es {
+    reverse_proxy zai:3001
+}

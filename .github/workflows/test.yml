@@ -34,6 +34,10 @@ jobs:
             cd /root/health-check &&
             docker-compose up -d &&
 
+            echo "Starting zai container..." &&
+            cd /root/zai &&
+            docker-compose up -d &&
+
             echo "Deploying Next.js application..." &&
             cd /root/enriqueteruel &&    
             docker-compose down &&
