@@ -7,5 +7,5 @@ enriqueteruel.com {
 }
 
 migration.zai.es {
-    reverse_proxy zai:3001
+    reverse_proxy zai:80
 }
