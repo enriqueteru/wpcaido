@@ -11,6 +11,10 @@ let users = [
   { id: 2, name: 'Jane Doe', email: 'jane@example.com' }
 ];
 
+app.get('/', (req, res) => {
+  res.send('Hello World');
+});
+
 
 app.get('/api/users', (req, res) => {
   res.json(users);
@@ -51,5 +55,5 @@ app.delete('/api/users/:id', (req, res) => {
 
 
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server is running on http://node.wpcaido.com`);
 });
