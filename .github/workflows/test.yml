@@ -34,12 +34,19 @@ jobs:
             cd /root/health-check &&
             docker-compose up -d &&
 
-            echo "Starting zai container..." &&
-            cd /root/zai &&
+            echo "Deploying Node application..." &&
+            cd /root/node &&    
+            docker-compose down &&
+            docker-compose pull || true &&
+            docker-compose build --no-cache &&
+            docker-compose up -d &&
+
+            echo "Starting wordpress container..." &&
+            cd /root/wordpress &&
             docker-compose up -d &&
 
             echo "Deploying Next.js application..." &&
-            cd /root/enriqueteruel &&    
+            cd /root/react &&    
             docker-compose down &&
             docker-compose pull || true &&
             docker-compose build --no-cache &&

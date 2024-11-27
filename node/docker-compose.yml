@@ -1,18 +1,17 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  nextjs:
+  node:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: enriqueteruel
+    container_name: node
     restart: always
     ports:
-      - "3000:3000"
+      - "3002:3000"
     volumes:
       - .:/app
       - /app/node_modules
-      - /app/.next
     environment:
       - NODE_ENV=development
     networks:
@@ -21,6 +20,3 @@ services:
 networks:
   caddy:
     external: true
-
-volumes:
-  postgres_data:
